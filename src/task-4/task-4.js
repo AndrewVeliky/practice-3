@@ -26,7 +26,21 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     addEventListeners() {
-        // Change me!
+        this.removeAllEl.addEventListener("click", () => {
+            this.removeAll();
+        });
+
+        this.cartEl.addEventListener("click", e => {
+            const target = e.target;
+
+            if (target.tagName !== "BUTTON") {
+                return;
+            }
+            
+            this.removeItem(target.closest("li").dataset.itemId);
+            
+        });
+        
     }
 
     /**
@@ -60,7 +74,17 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     incrementItem(item) {
-        // Change me!
+        const itemLi = this.cartEl.querySelector(`[data-item-id="${item.id}"]`);
+        const qtyWrapper = itemLi.querySelector("span.item-qty");
+        const priceWrapper = itemLi.querySelector("span.item-price");
+
+        const currentQty = parseInt(itemLi.dataset.itemQty, 10);
+        
+        itemLi.dataset.itemTotal = parseInt(itemLi.dataset.itemTotal, 10) + item.price;
+        itemLi.dataset.itemQty = `${currentQty + 1}`;
+
+        qtyWrapper.innerHTML = itemLi.dataset.itemQty;
+        priceWrapper.innerHTML = itemLi.dataset.itemTotal;
     }
 
     /**
@@ -69,7 +93,15 @@ export default class ShoppingCart {
      * @returns {boolean} - true if item is present in shopping cart, false otherwise
      */
     isItemInCart(id) {
-        // Change me!
+        const items = this.cartEl.children;
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].dataset.itemId === id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -77,7 +109,11 @@ export default class ShoppingCart {
      * @returns {boolean} true if there's no items in cart, false otherwise
      */
     isCartEmpty() {
-        // Change me!
+        if (this.cartEl.children.length === 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -85,7 +121,8 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     removeAll() {
-        // Change me!
+        this.cartEl.innerHTML = "";
+        this.updateCartState();
     }
 
     /**
@@ -94,7 +131,9 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     removeItem(id) {
-        // Change me!
+        const itemLi = this.cartEl.querySelector(`[data-item-id="${id}"]`);
+        this.cartEl.removeChild(itemLi);
+        this.updateCartState();
     }
 
     /**
@@ -112,7 +151,10 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     updateTotal() {
-        // Change me!
+        if (this.isCartEmpty()) {
+            this.totalEl.innerHTML = 0;
+        }
+        this.totalEl.innerHTML = this.getTotalSum();
     }
 
     /**
@@ -120,7 +162,14 @@ export default class ShoppingCart {
      * @returns {number} Total sum
      */
     getTotalSum() {
-        // Change me!
+        let total = 0;
+        const items = this.cartEl.children;
+
+        for (let i = 0; i < items.length; i++) {
+            total += parseInt(items[i].dataset.itemTotal, 10);
+        }
+
+        return total;
     }
 
     /**
@@ -129,9 +178,9 @@ export default class ShoppingCart {
      */
     updateNoItemsMessage() {
         if (this.isCartEmpty()) {
-            // Change me!
+            this.emptyCartEl.classList.remove("d-none");
         } else {
-            // Change me!
+            this.emptyCartEl.classList.add("d-none");
         }
     }
 
@@ -140,6 +189,10 @@ export default class ShoppingCart {
      * @returns {undefined}
      */
     updateRemoveAllButton() {
-        // Change me!
+        if (this.isCartEmpty()) {
+            this.removeAllEl.classList.add("d-none");
+        } else {
+            this.removeAllEl.classList.remove("d-none");
+        }
     }
 }
